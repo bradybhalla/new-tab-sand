@@ -105,21 +105,14 @@ void grid_tick(grid_t *grid) {
   }
 }
 
-void draw_row_rect(SDL_Renderer *renderer, SDL_Rect rect, grid_val_t type) {
-  if (type == SAND) {
-    SDL_SetRenderDrawColor(renderer, SAND_COLOR_R, SAND_COLOR_G, SAND_COLOR_B,
-                           255);
-  } else if (type == EMPTY) {
-    SDL_SetRenderDrawColor(renderer, EMPTY_COLOR_R, EMPTY_COLOR_G,
-                           EMPTY_COLOR_B, 255);
-  } else {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  }
-
+void draw_row_rect(SDL_Renderer *renderer, SDL_Rect rect, uint32_t color) {
+  SDL_SetRenderDrawColor(renderer, color & 0xff0000 >> 16, color & 0x00ff00 >> 8,
+                         color & 0x0000ff, 255);
   SDL_RenderFillRect(renderer, &rect);
 }
 
-void grid_draw(grid_t *grid, SDL_Renderer *renderer, pos_t window_size) {
+void grid_draw(grid_t *grid, SDL_Renderer *renderer, pos_t window_size,
+               uint32_t sand_color, uint32_t empty_color) {
   // rectangles are extended along a row as far as possible
   // before drawing
   bool rect_exists = false;
@@ -141,7 +134,9 @@ void grid_draw(grid_t *grid, SDL_Renderer *renderer, pos_t window_size) {
         // draw rectangle if the current cell is a different type
         rect.w = window_size.x * rect_cell_count / num_cols + 2;
         rect.h = window_size.y / num_rows + 2;
-        draw_row_rect(renderer, rect, rect_current_type);
+        uint32_t color = rect_current_type == SAND ? sand_color : empty_color;
+        draw_row_rect(renderer, rect, color);
+
         rect_exists = false;
       }
 
@@ -161,7 +156,9 @@ void grid_draw(grid_t *grid, SDL_Renderer *renderer, pos_t window_size) {
     // draw last rect in row
     rect.w = window_size.x * rect_cell_count / num_cols + 2;
     rect.h = window_size.y / num_rows + 2;
-    draw_row_rect(renderer, rect, rect_current_type);
+    uint32_t color = rect_current_type == SAND ? sand_color : empty_color;
+    draw_row_rect(renderer, rect, color);
+
     rect_exists = false;
   }
 }
@@ -220,11 +217,11 @@ void grid_resize(grid_t *grid, pos_t size) {
 }
 
 void grid_add_sand(grid_t *grid) {
-  pos_t rel_pos = {rand() % (grid->update_end.x - grid->update_start.x - 8) + 4,
-                   4};
+  pos_t rel_pos = {rand() % (grid->update_end.x - grid->update_start.x - BLOCK_SIZE) + BLOCK_SIZE/2,
+                   BLOCK_SIZE/2};
 
-  for (int r = -4; r <= 4; r++) {
-    for (int c = -4; c <= 4; c++) {
+  for (int r = -BLOCK_SIZE/2; r <= BLOCK_SIZE/2; r++) {
+    for (int c = -BLOCK_SIZE/2; c <= BLOCK_SIZE/2; c++) {
       pos_t pos = {rel_pos.x + c + grid->update_start.x,
                    rel_pos.y + r + grid->update_start.y};
 

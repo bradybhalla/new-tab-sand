@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <emscripten.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef struct program {
   SDL_Window *window;
@@ -13,6 +14,13 @@ typedef struct program {
   uint64_t last_grid_update_time;
 
   grid_t *grid;
+
+  // red = color & 0xff0000 << 16
+  // green = color & 0x00ff00 << 8
+  // blue = color & 0x0000ff
+  uint32_t sand_color;
+  uint32_t empty_color;
+
 } program_t;
 
 /* Check if the window size has changed */
@@ -23,7 +31,6 @@ bool program_window_size_changed(program_t *program) {
   return program->window_size.x != new_size.x ||
          program->window_size.y != new_size.y;
 }
-
 
 int max(int x, int y) { return x >= y ? x : y; }
 
@@ -57,6 +64,10 @@ program_t *program_init() {
   program->grid = NULL;
 
   program_resize(program);
+
+  getenv("asdf");
+  program->sand_color = 0xaaaaaa;
+  program->empty_color = 0x000000;
 
   return program;
 }
@@ -131,8 +142,10 @@ void loop(void *data) {
   }
 
   // clear screen
-  SDL_SetRenderDrawColor(program->renderer, EMPTY_COLOR_R, EMPTY_COLOR_G,
-                         EMPTY_COLOR_B, 255);
+  SDL_SetRenderDrawColor(program->renderer,
+                         program->empty_color & 0xff0000 >> 16,
+                         program->empty_color & 0x00ff00 >> 8,
+                         program->empty_color & 0x0000ff, 255);
   SDL_RenderClear(program->renderer);
 
   if (program->grid != NULL) {
@@ -143,7 +156,8 @@ void loop(void *data) {
     }
 
     // draw grid
-    grid_draw(program->grid, program->renderer, program->window_size);
+    grid_draw(program->grid, program->renderer, program->window_size,
+              program->sand_color, program->empty_color);
   }
 
   SDL_RenderPresent(program->renderer);
