@@ -17,12 +17,12 @@ dist-chrome.zip: dist
 	- cd dist && zip -r ../dist-chrome .
 
 dist: build
-	- mkdir dist
+	- mkdir -p dist
 	- cp -r build/ dist/build/
 	- cp $(STATIC_DIST_FILES) dist/
 
 build: $(SRC)
-	- mkdir build
+	- mkdir -p build
 	$(CC) $(FLAGS) -o build/main.js $(SRC)
 
 compile_flags.txt:

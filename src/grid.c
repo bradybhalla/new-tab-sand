@@ -106,8 +106,8 @@ void grid_tick(grid_t *grid) {
 }
 
 void draw_row_rect(SDL_Renderer *renderer, SDL_Rect rect, uint32_t color) {
-  SDL_SetRenderDrawColor(renderer, color & 0xff0000 >> 16, color & 0x00ff00 >> 8,
-                         color & 0x0000ff, 255);
+  SDL_SetRenderDrawColor(renderer, (color & 0xff0000) >> 16,
+                         (color & 0x00ff00) >> 8, color & 0x0000ff, 255);
   SDL_RenderFillRect(renderer, &rect);
 }
 
@@ -217,11 +217,13 @@ void grid_resize(grid_t *grid, pos_t size) {
 }
 
 void grid_add_sand(grid_t *grid) {
-  pos_t rel_pos = {rand() % (grid->update_end.x - grid->update_start.x - BLOCK_SIZE) + BLOCK_SIZE/2,
-                   BLOCK_SIZE/2};
+  pos_t rel_pos = {
+      rand() % (grid->update_end.x - grid->update_start.x - BLOCK_SIZE) +
+          BLOCK_SIZE / 2,
+      BLOCK_SIZE / 2};
 
-  for (int r = -BLOCK_SIZE/2; r <= BLOCK_SIZE/2; r++) {
-    for (int c = -BLOCK_SIZE/2; c <= BLOCK_SIZE/2; c++) {
+  for (int r = -BLOCK_SIZE / 2; r <= BLOCK_SIZE / 2; r++) {
+    for (int c = -BLOCK_SIZE / 2; c <= BLOCK_SIZE / 2; c++) {
       pos_t pos = {rel_pos.x + c + grid->update_start.x,
                    rel_pos.y + r + grid->update_start.y};
 

@@ -65,9 +65,8 @@ program_t *program_init() {
 
   program_resize(program);
 
-  getenv("asdf");
-  program->sand_color = 0xaaaaaa;
-  program->empty_color = 0x000000;
+  program->sand_color = 0x939ab7;
+  program->empty_color = 0x24273a;
 
   return program;
 }
@@ -143,8 +142,8 @@ void loop(void *data) {
 
   // clear screen
   SDL_SetRenderDrawColor(program->renderer,
-                         program->empty_color & 0xff0000 >> 16,
-                         program->empty_color & 0x00ff00 >> 8,
+                         (program->empty_color & 0xff0000) >> 16,
+                         (program->empty_color & 0x00ff00) >> 8,
                          program->empty_color & 0x0000ff, 255);
   SDL_RenderClear(program->renderer);
 
